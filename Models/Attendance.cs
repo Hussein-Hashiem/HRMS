@@ -7,5 +7,7 @@ namespace HRMS.Models
         public DateTime date { get; set; }
         public DateTime time_in { get; set; }
         public DateTime time_out { get; set; }
+
+        public List<Employee> employees { get; set; }   
     }
 }

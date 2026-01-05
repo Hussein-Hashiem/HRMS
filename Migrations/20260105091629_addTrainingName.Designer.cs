@@ -4,6 +4,7 @@ using HRMS.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260105091629_addTrainingName")]
+    partial class addTrainingName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,36 +24,6 @@ namespace HRMS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("AttendanceEmployee", b =>
-                {
-                    b.Property<int>("attendanceid")
-                        .HasColumnType("int");
-
-                    b.Property<int>("employeesid")
-                        .HasColumnType("int");
-
-                    b.HasKey("attendanceid", "employeesid");
-
-                    b.HasIndex("employeesid");
-
-                    b.ToTable("EmployeeAttendance", (string)null);
-                });
-
-            modelBuilder.Entity("EmployeeLeave", b =>
-                {
-                    b.Property<int>("employeesid")
-                        .HasColumnType("int");
-
-                    b.Property<int>("leavesid")
-                        .HasColumnType("int");
-
-                    b.HasKey("employeesid", "leavesid");
-
-                    b.HasIndex("leavesid");
-
-                    b.ToTable("EmployeeLeaves", (string)null);
-                });
 
             modelBuilder.Entity("EmployeeTraining", b =>
                 {
@@ -162,9 +135,6 @@ namespace HRMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<int>("employeeId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("netpay")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("decimal(18,2)")
@@ -174,9 +144,6 @@ namespace HRMS.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("id");
-
-                    b.HasIndex("employeeId")
-                        .IsUnique();
 
                     b.ToTable("Payrolls");
                 });
@@ -196,36 +163,6 @@ namespace HRMS.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Trainings");
-                });
-
-            modelBuilder.Entity("AttendanceEmployee", b =>
-                {
-                    b.HasOne("HRMS.Models.Attendance", null)
-                        .WithMany()
-                        .HasForeignKey("attendanceid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HRMS.Models.Employee", null)
-                        .WithMany()
-                        .HasForeignKey("employeesid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EmployeeLeave", b =>
-                {
-                    b.HasOne("HRMS.Models.Employee", null)
-                        .WithMany()
-                        .HasForeignKey("employeesid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HRMS.Models.Leave", null)
-                        .WithMany()
-                        .HasForeignKey("leavesid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("EmployeeTraining", b =>
@@ -254,26 +191,9 @@ namespace HRMS.Migrations
                     b.Navigation("department");
                 });
 
-            modelBuilder.Entity("HRMS.Models.Payroll", b =>
-                {
-                    b.HasOne("HRMS.Models.Employee", "employee")
-                        .WithOne("payroll")
-                        .HasForeignKey("HRMS.Models.Payroll", "employeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("employee");
-                });
-
             modelBuilder.Entity("HRMS.Models.Department", b =>
                 {
                     b.Navigation("employees");
-                });
-
-            modelBuilder.Entity("HRMS.Models.Employee", b =>
-                {
-                    b.Navigation("payroll")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

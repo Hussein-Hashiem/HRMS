@@ -9,7 +9,7 @@ namespace HRMS.Database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(
-                "Server=localhost;Database=HRMS;User Id=sa;Password=123@#@#hH;TrustServerCertificate=True;MultipleActiveResultSets=true"
+    "Server=.;Database=HRMS;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true"
             );
         }
         public DbSet<Attendance> Attendances { get; set; }
@@ -21,6 +21,58 @@ namespace HRMS.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            #region Employee
+            modelBuilder.Entity<Employee>()
+                .Property(e => e.name)
+                .HasMaxLength(25);
+
+            modelBuilder.Entity<Employee>()
+                .Property(e => e.position)
+                .HasMaxLength(25);
+            #endregion
+
+            #region Department
+            modelBuilder.Entity<Department>()
+                .Property(e => e.name)
+                .HasMaxLength(25);
+            #endregion
+
+
+            #region Payroll
+            modelBuilder.Entity<Payroll>()
+                .Property(p => p.netpay)
+                .HasComputedColumnSql("salary - (salary * 0.1)");
+            #endregion
+
+            #region Relationships
+            modelBuilder.Entity<Employee>()
+                .HasOne(d => d.department)
+                .WithMany(e => e.employees)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Employee>()
+                .HasMany(t => t.training)
+                .WithMany(e => e.employees)
+                .UsingEntity(j => j.ToTable("EmployeeTraining"));
+
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.payroll)
+                .WithOne(e => e.employee)
+                .HasForeignKey<Payroll>(e => e.employeeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Employee>()
+                .HasMany(l => l.leaves)
+                .WithMany(e => e.employees)
+                .UsingEntity(l => l.ToTable("EmployeeLeaves"));
+
+            modelBuilder.Entity<Employee>()
+                .HasMany(a => a.attendance)
+                .WithMany(e => e.employees)
+                .UsingEntity(a => a.ToTable("EmployeeAttendance"));
+            
+            #endregion
+
             base.OnModelCreating(modelBuilder);
         }
 

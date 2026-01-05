@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260101211803_tables")]
-    partial class tables
+    [Migration("20260105085746_test")]
+    partial class test
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,21 @@ namespace HRMS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("EmployeeTraining", b =>
+                {
+                    b.Property<int>("employeesid")
+                        .HasColumnType("int");
+
+                    b.Property<int>("trainingid")
+                        .HasColumnType("int");
+
+                    b.HasKey("employeesid", "trainingid");
+
+                    b.HasIndex("trainingid");
+
+                    b.ToTable("EmployeeTraining", (string)null);
+                });
 
             modelBuilder.Entity("HRMS.Models.Attendance", b =>
                 {
@@ -56,7 +71,8 @@ namespace HRMS.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.HasKey("id");
 
@@ -71,16 +87,23 @@ namespace HRMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
+                    b.Property<int>("departmentId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("hire_date")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<string>("position")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.HasKey("id");
+
+                    b.HasIndex("departmentId");
 
                     b.ToTable("Employees");
                 });
@@ -113,7 +136,9 @@ namespace HRMS.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<decimal>("netpay")
-                        .HasColumnType("decimal(18,2)");
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("decimal(18,2)")
+                        .HasComputedColumnSql("salary - (salary * 0.1)");
 
                     b.Property<decimal>("salary")
                         .HasColumnType("decimal(18,2)");
@@ -134,6 +159,37 @@ namespace HRMS.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Trainings");
+                });
+
+            modelBuilder.Entity("EmployeeTraining", b =>
+                {
+                    b.HasOne("HRMS.Models.Employee", null)
+                        .WithMany()
+                        .HasForeignKey("employeesid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRMS.Models.Training", null)
+                        .WithMany()
+                        .HasForeignKey("trainingid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HRMS.Models.Employee", b =>
+                {
+                    b.HasOne("HRMS.Models.Department", "department")
+                        .WithMany("employees")
+                        .HasForeignKey("departmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("department");
+                });
+
+            modelBuilder.Entity("HRMS.Models.Department", b =>
+                {
+                    b.Navigation("employees");
                 });
 #pragma warning restore 612, 618
         }
